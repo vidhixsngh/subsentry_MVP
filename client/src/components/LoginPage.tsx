@@ -1,11 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 export default function LoginPage() {
-  const handleGoogleLogin = () => {
-    console.log("Google login triggered");
-    // TODO: Implement Google OAuth
+  const { signInWithGoogle } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Login error:", error);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -29,10 +39,11 @@ export default function LoginPage() {
             className="w-full gap-2" 
             size="lg"
             onClick={handleGoogleLogin}
+            disabled={isLoading}
             data-testid="button-google-login"
           >
             <Mail className="w-5 h-5" />
-            Continue with Google
+            {isLoading ? "Signing in..." : "Continue with Google"}
           </Button>
           <p className="text-sm text-muted-foreground text-center">
             Stay on top of your subscriptions and manage your expenses effortlessly

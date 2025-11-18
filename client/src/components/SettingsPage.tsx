@@ -1,20 +1,37 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, User, Bell, Moon, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "wouter";
 
 interface SettingsPageProps {
   onBack?: () => void;
-  userName?: string;
-  userEmail?: string;
 }
 
-export default function SettingsPage({ onBack, userName = "Aarav Kapoor", userEmail = "aarav@example.com" }: SettingsPageProps) {
+export default function SettingsPage({ onBack }: SettingsPageProps) {
+  const { user, signOut } = useAuth();
+  const [, setLocation] = useLocation();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+
+  // Get user info from Google OAuth
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "User";
+  const userEmail = user?.email || "";
+  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setLocation("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -44,8 +61,11 @@ export default function SettingsPage({ onBack, userName = "Aarav Kapoor", userEm
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
+                {userAvatar ? (
+                  <AvatarImage src={userAvatar} alt={userName} />
+                ) : null}
                 <AvatarFallback className="bg-primary text-primary-foreground text-xl">
-                  {userName.split(' ').map(n => n[0]).join('')}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
@@ -110,6 +130,7 @@ export default function SettingsPage({ onBack, userName = "Aarav Kapoor", userEm
             <Button 
               variant="destructive" 
               className="w-full gap-2"
+              onClick={handleLogout}
               data-testid="button-logout"
             >
               <LogOut className="w-4 h-4" />
