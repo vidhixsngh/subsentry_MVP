@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -9,18 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
+import { insertSubscriptionSchema, type InsertSubscription } from "@shared/schema";
 
-const subscriptionSchema = z.object({
-  name: z.string().min(1, "Please enter a subscription name."),
-  amount: z.coerce.number().positive("Amount must be a positive number."),
-  renewalDate: z.string().min(1, "Pick a valid, future date."),
-  category: z.enum(["Streaming", "Utilities", "Productivity", "Other"], {
-    errorMap: () => ({ message: "Please choose a category." })
-  }),
-  note: z.string().max(120, "Note must be 120 characters or less.").optional(),
-});
-
-type SubscriptionFormData = z.infer<typeof subscriptionSchema>;
+type SubscriptionFormData = InsertSubscription;
 
 interface AddSubscriptionFormProps {
   onBack?: () => void;
@@ -31,13 +21,16 @@ export default function AddSubscriptionForm({ onBack, onSubmit }: AddSubscriptio
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<SubscriptionFormData>({
-    resolver: zodResolver(subscriptionSchema),
+    resolver: zodResolver(insertSubscriptionSchema),
     defaultValues: {
       name: "",
-      amount: 0,
+      amount: "",
       renewalDate: "",
+      billingCycle: undefined,
       category: undefined,
-      note: "",
+      status: "Pending",
+      paymentMethod: "",
+      notes: "",
     },
   });
 
@@ -87,64 +80,110 @@ export default function AddSubscriptionForm({ onBack, onSubmit }: AddSubscriptio
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00" 
-                        {...field}
-                        data-testid="input-amount"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="renewalDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Renewal Date *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date" 
-                        {...field}
-                        data-testid="input-renewal-date"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount *</FormLabel>
                       <FormControl>
-                        <SelectTrigger data-testid="select-category">
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
+                        <Input
+                          type="text"
+                          placeholder="0.00"
+                          {...field}
+                          data-testid="input-amount"
+                        />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Streaming">Streaming</SelectItem>
-                        <SelectItem value="Utilities">Utilities</SelectItem>
-                        <SelectItem value="Productivity">Productivity</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="billingCycle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Billing Cycle *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-billing-cycle">
+                            <SelectValue placeholder="Select billing cycle" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Weekly">Weekly</SelectItem>
+                          <SelectItem value="Monthly">Monthly</SelectItem>
+                          <SelectItem value="Quarterly">Quarterly</SelectItem>
+                          <SelectItem value="Yearly">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="renewalDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Renewal Date *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          data-testid="input-renewal-date"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-category">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Streaming">Streaming</SelectItem>
+                          <SelectItem value="Utilities">Utilities</SelectItem>
+                          <SelectItem value="Productivity">Productivity</SelectItem>
+                          <SelectItem value="Entertainment">Entertainment</SelectItem>
+                          <SelectItem value="SaaS">SaaS</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Method (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., Credit Card, PayPal"
+                        {...field}
+                        data-testid="input-payment-method"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -152,17 +191,17 @@ export default function AddSubscriptionForm({ onBack, onSubmit }: AddSubscriptio
 
               <FormField
                 control={form.control}
-                name="note"
+                name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Note (Optional)</FormLabel>
+                    <FormLabel>Notes (Optional)</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Add any additional details..."
                         className="resize-none"
                         rows={3}
                         {...field}
-                        data-testid="input-note"
+                        data-testid="input-notes"
                       />
                     </FormControl>
                     <FormMessage />

@@ -55,7 +55,7 @@ export default function DashboardOverview({ stats }: DashboardOverviewProps) {
           <TrendingUp className="w-4 h-4" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-semibold" data-testid="text-monthly-total">${stats.totalMonthly.toFixed(2)}</div>
+          <div className="text-2xl font-semibold" data-testid="text-monthly-total">₹{stats.totalMonthly.toFixed(2)}</div>
           <p className="text-xs opacity-90 mt-1">Expected this month</p>
         </CardContent>
       </Card>

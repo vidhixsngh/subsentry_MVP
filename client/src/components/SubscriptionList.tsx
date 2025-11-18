@@ -1,30 +1,20 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Play, Zap, Briefcase, Grid3x3 } from "lucide-react";
+import { Play, Zap, Briefcase, Grid3x3, Layers } from "lucide-react";
 import { format } from "date-fns";
-
-export type SubscriptionStatus = "Pending" | "Paid" | "Overdue";
-export type SubscriptionCategory = "Streaming" | "Utilities" | "Productivity" | "Other";
-
-export interface Subscription {
-  id: string;
-  name: string;
-  amount: number;
-  renewalDate: string;
-  category: SubscriptionCategory;
-  status: SubscriptionStatus;
-  note?: string;
-}
+import type { Subscription } from "@shared/schema";
 
 interface SubscriptionListProps {
   subscriptions: Subscription[];
   onSubscriptionClick?: (subscription: Subscription) => void;
 }
 
-const categoryIcons = {
+const categoryIcons: Record<string, any> = {
   Streaming: Play,
   Utilities: Zap,
   Productivity: Briefcase,
+  Entertainment: Play,
+  SaaS: Layers,
   Other: Grid3x3,
 };
 
@@ -73,10 +63,10 @@ export default function SubscriptionList({ subscriptions, onSubscriptionClick }:
               <div className="flex items-center gap-3 flex-shrink-0">
                 <div className="text-right">
                   <div className="font-semibold text-base" data-testid={`text-amount-${subscription.id}`}>
-                    ${subscription.amount.toFixed(2)}
+                    ₹{parseFloat(subscription.amount).toFixed(2)}
                   </div>
                 </div>
-                <Badge className={statusColors[subscription.status]} data-testid={`badge-status-${subscription.id}`}>
+                <Badge className={statusColors[subscription.status as keyof typeof statusColors]} data-testid={`badge-status-${subscription.id}`}>
                   {subscription.status}
                 </Badge>
               </div>

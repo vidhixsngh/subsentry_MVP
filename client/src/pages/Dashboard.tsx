@@ -1,82 +1,41 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardOverview from "@/components/DashboardOverview";
-import SubscriptionList, { Subscription } from "@/components/SubscriptionList";
+import SubscriptionList from "@/components/SubscriptionList";
 import AppHeader from "@/components/AppHeader";
-import { Plus, Calendar } from "lucide-react";
+import { Plus, Calendar, BarChart3, TrendingUp } from "lucide-react";
 import { useLocation } from "wouter";
-
-// TODO: Remove mock data - this will be fetched from API
-const mockSubscriptions: Subscription[] = [
-  { 
-    id: '1',
-    name: 'Netflix', 
-    amount: 12.99, 
-    renewalDate: '2024-07-10', 
-    category: 'Streaming', 
-    status: 'Pending' 
-  },
-  { 
-    id: '2',
-    name: 'Dropbox', 
-    amount: 9.99, 
-    renewalDate: '2024-07-03', 
-    category: 'Productivity', 
-    status: 'Paid' 
-  },
-  { 
-    id: '3',
-    name: 'Electricity', 
-    amount: 60.00, 
-    renewalDate: '2024-07-15', 
-    category: 'Utilities', 
-    status: 'Overdue' 
-  },
-  { 
-    id: '4',
-    name: 'Spotify', 
-    amount: 9.99, 
-    renewalDate: '2024-07-08', 
-    category: 'Streaming', 
-    status: 'Pending' 
-  },
-  { 
-    id: '5',
-    name: 'Adobe Creative Cloud', 
-    amount: 54.99, 
-    renewalDate: '2024-07-20', 
-    category: 'Productivity', 
-    status: 'Pending' 
-  },
-];
+import { getAllSubscriptions } from "@/lib/mockData";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
 
-  // TODO: Remove mock stats calculation - this will come from API
+  // TODO: Replace with API call - using mock data for now
+  const subscriptions = getAllSubscriptions();
+
+  // Calculate stats from subscriptions
   const stats = {
-    pending: mockSubscriptions.filter(s => s.status === 'Pending').length,
-    paid: mockSubscriptions.filter(s => s.status === 'Paid').length,
-    overdue: mockSubscriptions.filter(s => s.status === 'Overdue').length,
-    totalMonthly: mockSubscriptions.reduce((sum, s) => sum + s.amount, 0),
+    pending: subscriptions.filter(s => s.status === 'Pending').length,
+    paid: subscriptions.filter(s => s.status === 'Paid').length,
+    overdue: subscriptions.filter(s => s.status === 'Overdue').length,
+    totalMonthly: subscriptions.reduce((sum, s) => sum + parseFloat(s.amount), 0),
   };
 
-  const upcomingRenewals = [...mockSubscriptions]
+  const upcomingRenewals = [...subscriptions]
     .sort((a, b) => new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime())
     .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background">
       <AppHeader onSettingsClick={() => setLocation('/settings')} />
-      
+
       <main className="container mx-auto px-6 py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold">Dashboard</h2>
             <p className="text-muted-foreground mt-1">Track your subscriptions and manage expenses</p>
           </div>
-          <Button 
+          <Button
             onClick={() => setLocation('/add-subscription')}
             className="gap-2"
             data-testid="button-add-subscription"
@@ -96,9 +55,9 @@ export default function Dashboard() {
                 <CardDescription>All your tracked subscriptions in one place</CardDescription>
               </CardHeader>
               <CardContent>
-                <SubscriptionList 
-                  subscriptions={mockSubscriptions}
-                  onSubscriptionClick={(sub) => console.log('Subscription clicked:', sub)}
+                <SubscriptionList
+                  subscriptions={subscriptions}
+                  onSubscriptionClick={(sub) => setLocation(`/subscription/${sub.id}`)}
                 />
               </CardContent>
             </Card>
@@ -114,9 +73,10 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {upcomingRenewals.map((subscription) => (
-                  <div 
+                  <div
                     key={subscription.id}
                     className="flex items-center justify-between p-3 rounded-md hover-elevate cursor-pointer"
+                    onClick={() => setLocation(`/subscription/${subscription.id}`)}
                     data-testid={`renewal-${subscription.id}`}
                   >
                     <div className="flex-1 min-w-0">
@@ -125,7 +85,7 @@ export default function Dashboard() {
                         {new Date(subscription.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </p>
                     </div>
-                    <span className="font-semibold text-sm">${subscription.amount.toFixed(2)}</span>
+                    <span className="font-semibold text-sm">₹{parseFloat(subscription.amount).toFixed(2)}</span>
                   </div>
                 ))}
                 
@@ -140,12 +100,29 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-accent text-accent-foreground">
+            <Card className="bg-primary text-primary-foreground hover-elevate cursor-pointer transition-all" onClick={() => setLocation('/analytics')}>
               <CardContent className="pt-6">
-                <p className="text-sm font-medium mb-2">💡 Helpful Tip</p>
-                <p className="text-sm opacity-90">
-                  Set up reminders to get notified before your subscriptions renew. Never miss a payment again!
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-primary-foreground/10">
+                    <BarChart3 className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-semibold">View Analytics</p>
+                </div>
+                <p className="text-sm opacity-90 mb-4">
+                  Get detailed insights into your spending patterns, top subscriptions, and money-saving suggestions.
                 </p>
+                <Button
+                  variant="secondary"
+                  className="w-full gap-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLocation('/analytics');
+                  }}
+                  data-testid="button-view-analytics"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  View Analytics
+                </Button>
               </CardContent>
             </Card>
           </div>
