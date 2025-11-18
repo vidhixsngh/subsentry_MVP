@@ -5,13 +5,24 @@ import SubscriptionList from "@/components/SubscriptionList";
 import AppHeader from "@/components/AppHeader";
 import { Plus, Calendar, BarChart3, TrendingUp } from "lucide-react";
 import { useLocation } from "wouter";
-import { getAllSubscriptions } from "@/lib/mockData";
+import { useSubscriptions } from "@/hooks/useSubscriptions";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { subscriptions, isLoading } = useSubscriptions();
 
-  // TODO: Replace with API call - using mock data for now
-  const subscriptions = getAllSubscriptions();
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader onSettingsClick={() => setLocation('/settings')} />
+        <main className="container mx-auto px-6 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-muted-foreground">Loading subscriptions...</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   // Calculate stats from subscriptions
   const stats = {

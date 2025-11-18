@@ -1,42 +1,64 @@
 import { useLocation, useRoute } from "wouter";
 import SubscriptionDetailView from "@/components/SubscriptionDetailView";
-import { getSubscriptionById, updateSubscription, deleteSubscription } from "@/lib/mockData";
+import { useSubscription, useSubscriptions } from "@/hooks/useSubscriptions";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SubscriptionDetail() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/subscription/:id");
+  const { toast } = useToast();
+  
+  const { data: subscription, isLoading } = useSubscription(params?.id || '');
+  const { updateSubscription, deleteSubscription: deleteSubscriptionMutation } = useSubscriptions();
 
-  // TODO: Replace with API call - using mock data for now
-  const subscription = params?.id ? getSubscriptionById(params.id) : null;
-
-  const handleEdit = (data: any) => {
+  const handleEdit = async (data: any) => {
     if (!params?.id) return;
 
-    // TODO: Replace with API call - using mock data for now
-    const updated = updateSubscription(params.id, data);
-    if (updated) {
-      // Force a re-render by navigating
-      window.location.reload();
-    } else {
-      alert("Failed to update subscription. Please try again.");
+    try {
+      await updateSubscription({ id: params.id, updates: data });
+      toast({
+        title: "Subscription updated",
+        description: "Your changes have been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error updating subscription",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!params?.id) return;
 
-    // TODO: Replace with API call - using mock data for now
-    const deleted = deleteSubscription(params.id);
-    if (deleted) {
+    try {
+      await deleteSubscriptionMutation(params.id);
+      toast({
+        title: "Subscription deleted",
+        description: "The subscription has been removed.",
+      });
       setLocation("/");
-    } else {
-      alert("Failed to delete subscription. Please try again.");
+    } catch (error) {
+      toast({
+        title: "Error deleting subscription",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleBack = () => {
     setLocation("/");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading subscription...</div>
+      </div>
+    );
+  }
 
   if (!subscription) {
     return (
@@ -55,9 +77,21 @@ export default function SubscriptionDetail() {
     );
   }
 
+  // Transform Supabase data to match component expectations
+  const transformedSubscription = subscription ? {
+    ...subscription,
+    userId: subscription.user_id,
+    renewalDate: subscription.renewal_date,
+    billingCycle: subscription.billing_cycle,
+    paymentMethod: subscription.payment_method,
+    lastUsedDate: subscription.last_used_date,
+    createdAt: new Date(subscription.created_at),
+    updatedAt: new Date(subscription.updated_at),
+  } : null;
+
   return (
     <SubscriptionDetailView
-      subscription={subscription}
+      subscription={transformedSubscription as any}
       onBack={handleBack}
       onEdit={handleEdit}
       onDelete={handleDelete}

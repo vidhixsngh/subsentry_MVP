@@ -1,16 +1,28 @@
 import AddSubscriptionForm from "@/components/AddSubscriptionForm";
 import { useLocation } from "wouter";
-import type { InsertSubscription } from "@shared/schema";
-import { addSubscription } from "@/lib/mockData";
+import { useSubscriptions } from "@/hooks/useSubscriptions";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AddSubscription() {
   const [, setLocation] = useLocation();
+  const { createSubscription, isCreating } = useSubscriptions();
+  const { toast } = useToast();
 
-  const handleSubmit = (data: InsertSubscription) => {
-    // TODO: Replace with API call - using mock data for now
-    const newSubscription = addSubscription(data);
-    console.log("Subscription created:", newSubscription);
-    setLocation('/subscription-added');
+  const handleSubmit = async (data: any) => {
+    try {
+      await createSubscription(data);
+      toast({
+        title: "Subscription added",
+        description: "Your subscription has been successfully added.",
+      });
+      setLocation('/subscription-added');
+    } catch (error) {
+      toast({
+        title: "Error adding subscription",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

@@ -217,6 +217,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // REMINDER SETTINGS ROUTES
+  // ============================================
+
+  // Get user's reminder settings
+  app.get("/api/reminder-settings", async (req: Request, res: Response) => {
+    try {
+      const userId = getMockUserId(req);
+      
+      // Mock data for now - replace with actual DB query
+      const mockSettings = {
+        id: "mock-settings-id",
+        userId,
+        email: "user@example.com",
+        frequency: "weekly",
+        daysBefore: "3",
+        notificationsEnabled: "true",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      res.json(mockSettings);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch reminder settings" });
+    }
+  });
+
+  // Create or update reminder settings
+  app.post("/api/reminder-settings", async (req: Request, res: Response) => {
+    try {
+      const userId = getMockUserId(req);
+      const { frequency, daysBefore, email, notificationsEnabled } = req.body;
+
+      // Validate input
+      if (!frequency || !daysBefore) {
+        return res.status(400).json({ message: "Frequency and daysBefore are required" });
+      }
+
+      if (!["daily", "weekly"].includes(frequency)) {
+        return res.status(400).json({ message: "Frequency must be 'daily' or 'weekly'" });
+      }
+
+      // Mock response - replace with actual DB upsert
+      const settings = {
+        id: "mock-settings-id",
+        userId,
+        email: email || "user@example.com",
+        frequency,
+        daysBefore,
+        notificationsEnabled: notificationsEnabled !== undefined ? String(notificationsEnabled) : "true",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      res.status(201).json(settings);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to save reminder settings" });
+    }
+  });
+
+  // Update notification toggle
+  app.patch("/api/reminder-settings/toggle", async (req: Request, res: Response) => {
+    try {
+      const userId = getMockUserId(req);
+      const { notificationsEnabled } = req.body;
+
+      if (notificationsEnabled === undefined) {
+        return res.status(400).json({ message: "notificationsEnabled is required" });
+      }
+
+      // Mock response - replace with actual DB update
+      const settings = {
+        id: "mock-settings-id",
+        userId,
+        email: "user@example.com",
+        frequency: "weekly",
+        daysBefore: "3",
+        notificationsEnabled: String(notificationsEnabled),
+        updatedAt: new Date().toISOString(),
+      };
+
+      res.json(settings);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to update notification settings" });
+    }
+  });
+
+  // Get reminder logs (history)
+  app.get("/api/reminder-logs", async (req: Request, res: Response) => {
+    try {
+      const userId = getMockUserId(req);
+      const limit = parseInt(req.query.limit as string) || 50;
+
+      // Mock data - replace with actual DB query
+      const mockLogs = [
+        {
+          id: "log-1",
+          userId,
+          subscriptionId: "sub-1",
+          emailSentTo: "user@example.com",
+          sentAt: new Date().toISOString(),
+          status: "sent",
+          errorMessage: null,
+        },
+      ];
+
+      res.json(mockLogs);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch reminder logs" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

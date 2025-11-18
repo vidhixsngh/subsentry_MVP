@@ -3,13 +3,28 @@ import { Button } from "@/components/ui/button";
 import AppHeader from "@/components/AppHeader";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { ArrowLeft } from "lucide-react";
-import { calculateAnalytics } from "@/lib/mockData";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 export default function Analytics() {
   const [, setLocation] = useLocation();
+  const { analytics, isLoading } = useAnalytics();
 
-  // TODO: Replace with API call - using mock data for now
-  const analytics = calculateAnalytics();
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader onSettingsClick={() => setLocation('/settings')} />
+        <main className="container mx-auto px-6 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-muted-foreground">Loading analytics...</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

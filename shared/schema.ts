@@ -55,3 +55,46 @@ export const updateSubscriptionSchema = insertSubscriptionSchema.partial();
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type UpdateSubscription = z.infer<typeof updateSubscriptionSchema>;
+
+// User Reminder Settings Table
+export const userReminderSettings = pgTable("user_reminder_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  email: varchar("email").notNull(),
+  frequency: varchar("frequency", { length: 20 }).notNull(), // 'daily' or 'weekly'
+  daysBefore: varchar("days_before").notNull().default("3"),
+  notificationsEnabled: varchar("notifications_enabled").notNull().default("true"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+export const insertReminderSettingsSchema = createInsertSchema(userReminderSettings, {
+  email: z.string().email("Valid email is required"),
+  frequency: z.enum(["daily", "weekly"]),
+  daysBefore: z.string(),
+  notificationsEnabled: z.string(),
+}).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateReminderSettingsSchema = insertReminderSettingsSchema.partial();
+
+export type ReminderSettings = typeof userReminderSettings.$inferSelect;
+export type InsertReminderSettings = z.infer<typeof insertReminderSettingsSchema>;
+export type UpdateReminderSettings = z.infer<typeof updateReminderSettingsSchema>;
+
+// Reminder Logs Table
+export const reminderLogs = pgTable("reminder_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  subscriptionId: varchar("subscription_id").references(() => subscriptions.id, { onDelete: "cascade" }),
+  emailSentTo: varchar("email_sent_to").notNull(),
+  sentAt: timestamp("sent_at").notNull().default(sql`now()`),
+  status: varchar("status", { length: 20 }).notNull().default("sent"),
+  errorMessage: text("error_message"),
+});
+
+export type ReminderLog = typeof reminderLogs.$inferSelect;
