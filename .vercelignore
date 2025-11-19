@@ -1,0 +1,7 @@
+app/
+server/
+node_modules/
+.git/
+*.md
+.env.local
+.env.*.local
