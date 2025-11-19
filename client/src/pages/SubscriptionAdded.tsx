@@ -6,14 +6,14 @@ export default function SubscriptionAdded() {
 
   return (
     <SuccessScreen 
-      title="You're all caught up — great job!"
-      message="Your subscription has been added successfully. Keep tracking your expenses effortlessly."
+      title="Awesome! You're in control! 🎯"
+      message="Your subscription is now being tracked. Stay on top of your spending and never miss a renewal again!"
       primaryAction={{
-        label: "Return to Dashboard",
+        label: "View Dashboard",
         onClick: () => setLocation('/')
       }}
       secondaryAction={{
-        label: "Add Another",
+        label: "Add Another Subscription",
         onClick: () => setLocation('/add-subscription')
       }}
     />

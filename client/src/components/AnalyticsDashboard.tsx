@@ -5,9 +5,6 @@ import SpendingPieChart from "./analytics/SpendingPieChart";
 import CategoryBarChart from "./analytics/CategoryBarChart";
 import TopSubscriptionsCard from "./analytics/TopSubscriptionsCard";
 import LeastUsedCard from "./analytics/LeastUsedCard";
-import AIInsightsCard from "./analytics/AIInsightsCard";
-import { useAIInsights } from "@/hooks/useAIInsights";
-import { useEffect } from "react";
 
 interface AnalyticsData {
   totalMonthly: number;
@@ -42,55 +39,6 @@ interface AnalyticsDashboardProps {
 }
 
 export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProps) {
-  const { insights, isLoading, generateInsights, refreshInsights } = useAIInsights();
-
-  // Generate AI insights on mount
-  useEffect(() => {
-    if (analytics.totalSubscriptions > 0) {
-      generateInsights({
-        totalMonthly: analytics.totalMonthly,
-        totalSubscriptions: analytics.totalSubscriptions,
-        categoryBreakdown: analytics.categoryBreakdown,
-        top3: analytics.top3.map(sub => ({
-          name: sub.name,
-          amount: parseFloat(sub.amount),
-          category: sub.category,
-          billingCycle: sub.billingCycle,
-          lastUsedDate: sub.lastUsedDate,
-        })),
-        leastUsed: analytics.leastUsed ? {
-          name: analytics.leastUsed.name,
-          amount: parseFloat(analytics.leastUsed.amount),
-          category: '', // Not needed for AI
-          billingCycle: analytics.leastUsed.billingCycle,
-          lastUsedDate: analytics.leastUsed.lastUsedDate,
-        } : null,
-      });
-    }
-  }, [analytics.totalSubscriptions]); // Only regenerate when subscription count changes
-
-  const handleRefreshInsights = () => {
-    refreshInsights({
-      totalMonthly: analytics.totalMonthly,
-      totalSubscriptions: analytics.totalSubscriptions,
-      categoryBreakdown: analytics.categoryBreakdown,
-      top3: analytics.top3.map(sub => ({
-        name: sub.name,
-        amount: parseFloat(sub.amount),
-        category: sub.category,
-        billingCycle: sub.billingCycle,
-        lastUsedDate: sub.lastUsedDate,
-      })),
-      leastUsed: analytics.leastUsed ? {
-        name: analytics.leastUsed.name,
-        amount: parseFloat(analytics.leastUsed.amount),
-        category: '',
-        billingCycle: analytics.leastUsed.billingCycle,
-        lastUsedDate: analytics.leastUsed.lastUsedDate,
-      } : null,
-    });
-  };
-
   // Prepare bar chart data
   const barChartData = Object.entries(analytics.categoryBreakdown).map(([name, value]) => ({
     name,
@@ -99,14 +47,6 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* AI Insights Card - Prominent at top */}
-      {analytics.totalSubscriptions > 0 && (
-        <AIInsightsCard
-          insights={insights}
-          isLoading={isLoading}
-          onRefresh={handleRefreshInsights}
-        />
-      )}
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -464,8 +464,16 @@ export default function SubscriptionDetailView({
               )}
 
               <div className="space-y-2 pt-4 border-t text-xs text-muted-foreground">
-                <p>Created: {new Date(subscription.createdAt).toLocaleDateString('en-IN')}</p>
-                <p>Last updated: {new Date(subscription.updatedAt).toLocaleDateString('en-IN')}</p>
+                <p>Created: {subscription.createdAt ? new Date(subscription.createdAt).toLocaleDateString('en-IN', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric' 
+                }) : 'N/A'}</p>
+                <p>Last updated: {subscription.updatedAt ? new Date(subscription.updatedAt).toLocaleDateString('en-IN', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric' 
+                }) : 'N/A'}</p>
               </div>
             </div>
           )}

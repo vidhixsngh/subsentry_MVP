@@ -12,8 +12,8 @@ export default function AddSubscription() {
     try {
       await createSubscription(data);
       toast({
-        title: "Subscription added",
-        description: "Your subscription has been successfully added.",
+        title: "Success! 🎉",
+        description: `${data.name} has been added to your subscriptions.`,
       });
       setLocation('/subscription-added');
     } catch (error) {
