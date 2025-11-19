@@ -12,14 +12,23 @@ interface AnalyticsData {
     amount: string;
     monthlyAmount: number;
     category: string;
+    billingCycle: string;
+    lastUsedDate?: string | null;
   }>;
   leastUsed: {
     id: string;
     name: string;
     amount: string;
-    billing_cycle: string;
+    billingCycle: string;
+    lastUsedDate?: string | null;
+    score?: number;
   } | null;
   statusBreakdown: Record<string, number>;
+  chartData: Array<{
+    name: string;
+    value: number;
+    percentage: number;
+  }>;
 }
 
 export function useAnalytics() {
@@ -37,6 +46,7 @@ export function useAnalytics() {
           top3: [],
           leastUsed: null,
           statusBreakdown: {},
+          chartData: [],
         };
       }
 
@@ -101,26 +111,46 @@ export function useAnalytics() {
         .sort((a, b) => b.monthlyAmount - a.monthlyAmount)
         .slice(0, 3);
 
-      // Least used (based on billing frequency - yearly = least essential)
-      const frequencyScore: Record<string, number> = {
-        Yearly: 1,
-        Quarterly: 2,
-        Monthly: 3,
-        Weekly: 4,
-      };
-
+      // Least used (based on last_used_date and billing frequency)
       const leastUsed = [...subscriptions]
-        .map((sub) => ({
-          ...sub,
-          score: frequencyScore[sub.billing_cycle] || 0,
-        }))
-        .sort((a, b) => a.score - b.score)[0] || null;
+        .map((sub) => {
+          let score = 0;
+          
+          // Score based on last used date (older = higher score = less used)
+          if (sub.lastUsedDate) {
+            const daysSinceUsed = Math.floor(
+              (new Date().getTime() - new Date(sub.lastUsedDate).getTime()) / (1000 * 60 * 60 * 24)
+            );
+            score += daysSinceUsed;
+          } else {
+            score += 365; // No usage data = assume not used
+          }
+          
+          // Additional score based on billing cycle (yearly = less essential)
+          const frequencyScore: Record<string, number> = {
+            Yearly: 100,
+            Quarterly: 50,
+            Monthly: 20,
+            Weekly: 0,
+          };
+          score += frequencyScore[sub.billingCycle] || 0;
+          
+          return { ...sub, score };
+        })
+        .sort((a, b) => b.score - a.score)[0] || null;
 
       // Status breakdown
       const statusBreakdown = subscriptions.reduce((acc, sub) => {
         acc[sub.status] = (acc[sub.status] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
+
+      // Chart data for pie chart
+      const chartData = Object.entries(categoryBreakdown).map(([name, value]) => ({
+        name,
+        value: Math.round(value),
+        percentage: Math.round((value / totalMonthly) * 100),
+      }));
 
       return {
         totalMonthly,
@@ -129,6 +159,7 @@ export function useAnalytics() {
         top3,
         leastUsed,
         statusBreakdown,
+        chartData,
       };
     },
     enabled: !!user && !subsLoading,
