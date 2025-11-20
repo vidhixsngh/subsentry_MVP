@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, User, Bell, Moon, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useLocation } from "wouter";
 
 interface SettingsPageProps {
@@ -14,9 +15,9 @@ interface SettingsPageProps {
 
 export default function SettingsPage({ onBack }: SettingsPageProps) {
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [, setLocation] = useLocation();
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
   // Get user info from Google OAuth
   const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "User";
@@ -117,8 +118,8 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               </div>
               <Switch 
                 id="dark-mode"
-                checked={darkMode}
-                onCheckedChange={setDarkMode}
+                checked={theme === 'dark'}
+                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
                 data-testid="switch-dark-mode"
               />
             </div>
