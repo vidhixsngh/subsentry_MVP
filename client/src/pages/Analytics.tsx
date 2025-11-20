@@ -27,7 +27,7 @@ export default function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
       <AppHeader onSettingsClick={() => setLocation('/settings')} />
 
       <main className="container mx-auto px-6 py-8">
@@ -43,8 +43,8 @@ export default function Analytics() {
           </Button>
 
           <div>
-            <h2 className="text-3xl font-semibold">Analytics</h2>
-            <p className="text-muted-foreground mt-1">
+            <h2 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Analytics</h2>
+            <p className="text-muted-foreground mt-1 dark:text-gray-400">
               Insights into your subscription spending
             </p>
           </div>

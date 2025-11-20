@@ -77,29 +77,29 @@ export default function Dashboard() {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/30 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
       <AppHeader onSettingsClick={() => setLocation('/settings')} />
 
       <main className="container mx-auto px-6 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Header with Stats Summary */}
         <div className="flex items-start justify-between gap-6">
           <div className="flex-1">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Hey {firstName}! 👋</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Hey {firstName}! 👋</h2>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
-                <span className="text-gray-600">
-                  <span className="font-semibold text-gray-900">{subscriptions.length}</span> subscriptions
+                <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-gray-600 dark:text-gray-400">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{subscriptions.length}</span> subscriptions
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-emerald-600" />
-                <span className="text-gray-600">
-                  <span className="font-semibold text-gray-900">₹{stats.totalMonthly.toFixed(2)}</span>/month
+                <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-gray-600 dark:text-gray-400">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">₹{stats.totalMonthly.toFixed(2)}</span>/month
                 </span>
               </div>
               {stats.overdue > 0 && (
-                <div className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                <div className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded-full">
                   {stats.overdue} overdue
                 </div>
               )}
@@ -108,7 +108,7 @@ export default function Dashboard() {
           <div className="flex gap-3">
             <Button
               onClick={() => setLocation('/reminders')}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
               data-testid="button-setup-reminders"
             >
               <Calendar className="w-4 h-4" />
@@ -116,7 +116,7 @@ export default function Dashboard() {
             </Button>
             <Button
               onClick={() => setLocation('/add-subscription')}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
               data-testid="button-add-subscription"
             >
               <Plus className="w-4 h-4" />
@@ -126,14 +126,14 @@ export default function Dashboard() {
 
         {/* Upcoming Renewals - Compact */}
         {upcomingRenewals.length > 0 && (
-          <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+          <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/50 dark:to-gray-900">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-emerald-600" />
+                  <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   <CardTitle className="text-lg">Upcoming Renewals</CardTitle>
                 </div>
-                <span className="text-sm text-emerald-700 font-medium">
+                <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
                   Next {upcomingRenewals.length}
                 </span>
               </div>
@@ -148,11 +148,11 @@ export default function Dashboard() {
                   // Color coding: Red for today, Yellow for <=3 days, White for >3 days
                   let cardStyle = '';
                   if (daysUntil === 0) {
-                    cardStyle = 'border-red-400 bg-red-50 hover:border-red-500';
+                    cardStyle = 'border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-950/50 hover:border-red-500 dark:hover:border-red-500';
                   } else if (daysUntil > 0 && daysUntil <= 3) {
-                    cardStyle = 'border-yellow-400 bg-yellow-50 hover:border-yellow-500';
+                    cardStyle = 'border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-950/30 hover:border-yellow-500 dark:hover:border-yellow-500';
                   } else {
-                    cardStyle = 'border-gray-200 bg-white hover:border-gray-300';
+                    cardStyle = 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600';
                   }
                   
                   return (
@@ -164,16 +164,16 @@ export default function Dashboard() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900">{subscription.name}</h4>
-                          <p className="text-sm text-gray-600">
+                          <h4 className="font-semibold text-gray-900 dark:text-gray-100">{subscription.name}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
                             {daysUntil === 0 ? '🔴 Renews today' : daysUntil === 1 ? '🟡 Renews tomorrow' : daysUntil <= 3 ? `🟡 Renews in ${daysUntil} days` : `Renews in ${daysUntil} days`}
                           </p>
                         </div>
                         <div className="text-right">
-                          <div className="text-lg font-bold text-emerald-600">
+                          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                             ₹{parseFloat(subscription.amount).toFixed(2)}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(subscription.renewalDate).toLocaleDateString('en-IN', { 
                               month: 'short', 
                               day: 'numeric'
@@ -192,12 +192,19 @@ export default function Dashboard() {
         {/* Your Subscriptions and AI Insights Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Your Subscriptions */}
-          <Card>
+          <Card className="border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-blue-950/50 dark:via-gray-900 dark:to-blue-950/30">
             <CardHeader>
-              <CardTitle className="text-xl">Your Subscriptions</CardTitle>
-              <CardDescription>
-                Manage and track all your active subscriptions
-              </CardDescription>
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl text-blue-900 dark:text-blue-100">Your Subscriptions</CardTitle>
+                  <CardDescription className="dark:text-gray-400">
+                    Manage and track all your active subscriptions
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <SubscriptionList
