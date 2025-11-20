@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import SubscriptionList from "@/components/SubscriptionList";
 import AppHeader from "@/components/AppHeader";
 import AIInsightsCard from "@/components/analytics/AIInsightsCard";
-import { Plus, Calendar, TrendingUp, DollarSign, CreditCard, Check } from "lucide-react";
+import { Plus, Calendar, TrendingUp, DollarSign, CreditCard, Check, Sparkles, Bell, BarChart3, Lightbulb, Zap, Shield } from "lucide-react";
 import { useLocation } from "wouter";
 import { useSubscriptions } from "@/hooks/useSubscriptions";
 import { useAuth } from "@/contexts/AuthContext";
@@ -244,6 +244,165 @@ export default function Dashboard() {
   const upcomingRenewals = [...subscriptions]
     .sort((a, b) => new Date(a.renewalDate).getTime() - new Date(b.renewalDate).getTime())
     .slice(0, 3);
+
+  // Empty state for new users
+  if (subscriptions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-emerald-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
+        <AppHeader onSettingsClick={() => setLocation('/settings')} />
+        
+        <main className="container mx-auto px-6 py-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Welcome Hero */}
+          <div className="text-center space-y-4 py-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-400 dark:to-emerald-500 rounded-full mb-4 animate-in zoom-in duration-500">
+              <Sparkles className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+              Welcome to SubSentry, {firstName}! 🎉
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Your smart subscription manager is ready to help you track, manage, and optimize all your subscriptions in one place.
+            </p>
+            <div className="flex gap-4 justify-center pt-4">
+              <Button
+                size="lg"
+                onClick={() => setLocation('/add-subscription')}
+                className="gap-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-lg px-8"
+              >
+                <Plus className="w-5 h-5" />
+                Add Your First Subscription
+              </Button>
+            </div>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/50 dark:to-gray-900 hover:shadow-lg transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center mb-3">
+                  <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <CardTitle className="text-xl dark:text-gray-100">Smart Reminders</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Never miss a payment again with intelligent renewal notifications
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/50 dark:to-gray-900 hover:shadow-lg transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mb-3">
+                  <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <CardTitle className="text-xl dark:text-gray-100">Analytics Dashboard</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Visualize your spending patterns with beautiful charts and insights
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/50 dark:to-gray-900 hover:shadow-lg transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mb-3">
+                  <Lightbulb className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <CardTitle className="text-xl dark:text-gray-100">AI Insights</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Get personalized recommendations to optimize your subscriptions
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/50 dark:to-gray-900 hover:shadow-lg transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center mb-3">
+                  <Zap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                </div>
+                <CardTitle className="text-xl dark:text-gray-100">Quick Payments</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Mark payments and track renewal dates with one click
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-white dark:from-green-950/50 dark:to-gray-900 hover:shadow-lg transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mb-3">
+                  <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <CardTitle className="text-xl dark:text-gray-100">Spending Tracking</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Monitor your monthly spending across all billing cycles
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/50 dark:to-gray-900 hover:shadow-lg transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center mb-3">
+                  <Shield className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <CardTitle className="text-xl dark:text-gray-100">Secure & Private</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Your data is encrypted and protected with enterprise-grade security
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+
+          {/* Quick Start Guide */}
+          <Card className="max-w-4xl mx-auto border-2 border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 via-white to-emerald-50 dark:from-emerald-950/50 dark:via-gray-900 dark:to-emerald-950/30">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2 dark:text-gray-100">
+                <Sparkles className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                Getting Started is Easy
+              </CardTitle>
+              <CardDescription className="text-base dark:text-gray-400">
+                Follow these simple steps to take control of your subscriptions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800/50 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center justify-center w-8 h-8 bg-emerald-600 dark:bg-emerald-500 text-white rounded-full font-bold flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Add Your Subscriptions</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Click "Add Subscription" and enter details like name, amount, and renewal date
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800/50 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center justify-center w-8 h-8 bg-emerald-600 dark:bg-emerald-500 text-white rounded-full font-bold flex-shrink-0">
+                  2
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Set Up Reminders</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Configure email reminders so you never miss a renewal date
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800/50 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center justify-center w-8 h-8 bg-emerald-600 dark:bg-emerald-500 text-white rounded-full font-bold flex-shrink-0">
+                  3
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Track & Optimize</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    View analytics, get AI insights, and optimize your spending
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-950">
