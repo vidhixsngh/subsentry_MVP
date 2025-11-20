@@ -53,7 +53,7 @@ export function useAnalytics() {
       // Calculate total monthly spending
       const totalMonthly = subscriptions.reduce((sum, sub) => {
         const amount = parseFloat(sub.amount);
-        switch (sub.billing_cycle) {
+        switch (sub.billingCycle) {
           case 'Weekly':
             return sum + amount * 4;
           case 'Monthly':
@@ -72,7 +72,7 @@ export function useAnalytics() {
         const amount = parseFloat(sub.amount);
         let monthlyAmount = amount;
 
-        switch (sub.billing_cycle) {
+        switch (sub.billingCycle) {
           case 'Weekly':
             monthlyAmount = amount * 4;
             break;
@@ -94,7 +94,7 @@ export function useAnalytics() {
           const amount = parseFloat(sub.amount);
           let monthlyAmount = amount;
 
-          switch (sub.billing_cycle) {
+          switch (sub.billingCycle) {
             case 'Weekly':
               monthlyAmount = amount * 4;
               break;

@@ -38,7 +38,23 @@ export default function LeastUsedCard({ subscription }: LeastUsedCardProps) {
     ? formatDistanceToNow(new Date(subscription.lastUsedDate), { addSuffix: true })
     : 'Never tracked';
 
-  const monthlyAmount = parseFloat(subscription.amount);
+  const amount = parseFloat(subscription.amount);
+  
+  // Calculate monthly equivalent based on billing cycle
+  let monthlyAmount = amount;
+  switch (subscription.billingCycle) {
+    case 'Weekly':
+      monthlyAmount = amount * 4;
+      break;
+    case 'Quarterly':
+      monthlyAmount = amount / 3;
+      break;
+    case 'Yearly':
+      monthlyAmount = amount / 12;
+      break;
+    // Monthly is default, no conversion needed
+  }
+  
   const annualCost = monthlyAmount * 12;
 
   return (
@@ -71,8 +87,12 @@ export default function LeastUsedCard({ subscription }: LeastUsedCardProps) {
           <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
             <span className="text-sm text-gray-600 dark:text-gray-400">Current cost:</span>
             <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              ₹{monthlyAmount.toFixed(2)}<span className="text-sm font-normal text-gray-500 dark:text-gray-400">/{subscription.billingCycle}</span>
+              ₹{amount.toFixed(2)}<span className="text-sm font-normal text-gray-500 dark:text-gray-400">/{subscription.billingCycle}</span>
             </span>
+          </div>
+          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+            <span>Monthly equivalent:</span>
+            <span className="font-semibold">₹{monthlyAmount.toFixed(2)}/month</span>
           </div>
         </div>
 

@@ -61,14 +61,14 @@ export default function SubscriptionList({ subscriptions, onSubscriptionClick }:
                 </p>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
+                <Badge className={statusColors[subscription.status as keyof typeof statusColors]} data-testid={`badge-status-${subscription.id}`}>
+                  {subscription.status}
+                </Badge>
                 <div className="text-right">
                   <div className="font-semibold text-base" data-testid={`text-amount-${subscription.id}`}>
                     ₹{parseFloat(subscription.amount).toFixed(2)}
                   </div>
                 </div>
-                <Badge className={statusColors[subscription.status as keyof typeof statusColors]} data-testid={`badge-status-${subscription.id}`}>
-                  {subscription.status}
-                </Badge>
               </div>
             </CardContent>
           </Card>

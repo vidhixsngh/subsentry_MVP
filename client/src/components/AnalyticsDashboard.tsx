@@ -67,7 +67,6 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium dark:text-gray-200">Monthly Total</CardTitle>
             <div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg">
-              <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
           </CardHeader>
           <CardContent>
@@ -123,10 +122,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
 
       {/* Paid Subscriptions Dialog */}
       <Dialog open={showPaidDialog} onOpenChange={setShowPaidDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto dark:bg-gray-900 dark:border-gray-800">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <DialogTitle className="flex items-center gap-2 dark:text-gray-100">
+              <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
               Paid Subscriptions ({paidSubscriptions.length})
             </DialogTitle>
           </DialogHeader>
@@ -137,7 +136,7 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
               paidSubscriptions.map((sub) => (
                 <div
                   key={sub.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors dark:border-gray-700"
                   onClick={() => {
                     setShowPaidDialog(false);
                     setLocation(`/subscription/${sub.id}`);
@@ -145,12 +144,12 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-gray-900">{sub.name}</h4>
-                      <p className="text-sm text-gray-600">{sub.category}</p>
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">{sub.name}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{sub.category}</p>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-emerald-600">₹{parseFloat(sub.amount).toFixed(2)}</div>
-                      <div className="text-xs text-gray-500">{sub.billingCycle}</div>
+                      <div className="font-bold text-emerald-600 dark:text-emerald-400">₹{parseFloat(sub.amount).toFixed(2)}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{sub.billingCycle}</div>
                     </div>
                   </div>
                 </div>
@@ -162,10 +161,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
 
       {/* Needs Attention Dialog */}
       <Dialog open={showAttentionDialog} onOpenChange={setShowAttentionDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto dark:bg-gray-900 dark:border-gray-800">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-600" />
+            <DialogTitle className="flex items-center gap-2 dark:text-gray-100">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               Needs Attention ({attentionSubscriptions.length})
             </DialogTitle>
           </DialogHeader>
@@ -176,8 +175,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
               attentionSubscriptions.map((sub) => (
                 <div
                   key={sub.id}
-                  className={`p-4 border-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
-                    sub.status === 'Overdue' ? 'border-red-300 bg-red-50' : 'border-amber-300 bg-amber-50'
+                  className={`p-4 border-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors ${
+                    sub.status === 'Overdue' 
+                      ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/30' 
+                      : 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30'
                   }`}
                   onClick={() => {
                     setShowAttentionDialog(false);
@@ -187,20 +188,20 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-900">{sub.name}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">{sub.name}</h4>
                         <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                           sub.status === 'Overdue' 
-                            ? 'bg-red-200 text-red-800' 
-                            : 'bg-amber-200 text-amber-800'
+                            ? 'bg-red-200 dark:bg-red-900/50 text-red-800 dark:text-red-300' 
+                            : 'bg-amber-200 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'
                         }`}>
                           {sub.status}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">{sub.category}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{sub.category}</p>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-gray-900">₹{parseFloat(sub.amount).toFixed(2)}</div>
-                      <div className="text-xs text-gray-500">{sub.billingCycle}</div>
+                      <div className="font-bold text-gray-900 dark:text-gray-100">₹{parseFloat(sub.amount).toFixed(2)}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{sub.billingCycle}</div>
                     </div>
                   </div>
                 </div>
@@ -211,10 +212,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
       </Dialog>
 
       {/* Summary Alert */}
-      <Alert className="border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30">
-        <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-        <AlertTitle className="text-emerald-900 dark:text-emerald-100">Monthly Spending Summary</AlertTitle>
-        <AlertDescription className="text-emerald-800 dark:text-emerald-300">
+      <Alert className="border-yellow-300 dark:border-yellow-500/50 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/40 dark:to-amber-800/40">
+        <TrendingUp className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+        <AlertTitle className="text-yellow-900 dark:text-yellow-300">Monthly Spending Summary</AlertTitle>
+        <AlertDescription className="text-yellow-800 dark:text-yellow-200">
           This month you spent <strong>₹{analytics.totalMonthly.toFixed(2)}</strong> across{' '}
           <strong>{analytics.totalSubscriptions}</strong> subscription{analytics.totalSubscriptions !== 1 ? 's' : ''}.
           {analytics.chartData.length > 0 && (
@@ -227,10 +228,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pie Chart */}
-        <Card className="hover:shadow-lg transition-shadow border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/50 dark:to-gray-900">
+        <Card className="hover:shadow-lg transition-shadow border-yellow-300 dark:border-yellow-500/50 bg-gradient-to-br from-yellow-50 via-amber-50 to-white dark:from-yellow-800/40 dark:via-amber-700/30 dark:to-gray-900">
           <CardHeader>
-            <CardTitle className="dark:text-gray-100">Monthly Spend Breakdown</CardTitle>
-            <p className="text-sm text-muted-foreground dark:text-gray-400">Distribution by category</p>
+            <CardTitle className="dark:text-yellow-200">Monthly Spend Breakdown</CardTitle>
+            <p className="text-sm text-muted-foreground dark:text-yellow-300/70">Distribution by category</p>
           </CardHeader>
           <CardContent>
             <SpendingPieChart data={analytics.chartData} />
@@ -238,10 +239,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
         </Card>
 
         {/* Bar Chart */}
-        <Card className="hover:shadow-lg transition-shadow border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/50 dark:to-gray-900">
+        <Card className="hover:shadow-lg transition-shadow border-amber-300 dark:border-amber-500/50 bg-gradient-to-br from-amber-50 via-yellow-50 to-white dark:from-amber-800/40 dark:via-yellow-700/30 dark:to-gray-900">
           <CardHeader>
-            <CardTitle className="dark:text-gray-100">Category Comparison</CardTitle>
-            <p className="text-sm text-muted-foreground dark:text-gray-400">Compare spending across categories</p>
+            <CardTitle className="dark:text-amber-200">Category Comparison</CardTitle>
+            <p className="text-sm text-muted-foreground dark:text-amber-300/70">Compare spending across categories</p>
           </CardHeader>
           <CardContent>
             <CategoryBarChart data={barChartData} />

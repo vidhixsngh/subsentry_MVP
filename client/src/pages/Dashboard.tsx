@@ -3,13 +3,167 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import SubscriptionList from "@/components/SubscriptionList";
 import AppHeader from "@/components/AppHeader";
 import AIInsightsCard from "@/components/analytics/AIInsightsCard";
-import { Plus, Calendar, TrendingUp, DollarSign } from "lucide-react";
+import { Plus, Calendar, TrendingUp, DollarSign, CreditCard, Check } from "lucide-react";
 import { useLocation } from "wouter";
 import { useSubscriptions } from "@/hooks/useSubscriptions";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useAIInsights } from "@/hooks/useAIInsights";
-import { useEffect } from "react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+
+interface RenewalItemProps {
+  subscription: any;
+  onViewDetails: () => void;
+}
+
+function RenewalItem({ subscription, onViewDetails }: RenewalItemProps) {
+  const { updateSubscription } = useSubscriptions();
+  const { toast } = useToast();
+  const [isPaid, setIsPaid] = useState(subscription.status === 'Paid');
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const daysUntil = Math.ceil(
+    (new Date(subscription.renewalDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  // Color coding: Red for today, Yellow for <=3 days, White for >3 days
+  let cardStyle = '';
+  if (daysUntil === 0) {
+    cardStyle = 'border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-950/50 hover:border-red-500 dark:hover:border-red-500';
+  } else if (daysUntil > 0 && daysUntil <= 3) {
+    cardStyle = 'border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-950/30 hover:border-yellow-500 dark:hover:border-yellow-500';
+  } else {
+    cardStyle = 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600';
+  }
+
+  const handlePayNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast({
+      title: "Payment Gateway",
+      description: "Payment feature coming soon! This is a demo button.",
+      duration: 3000,
+    });
+  };
+
+  const handleTogglePaid = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsUpdating(true);
+
+    try {
+      const newStatus = !isPaid;
+      let updates: any = {
+        status: newStatus ? 'Paid' : 'Pending',
+      };
+
+      // If marking as paid, calculate next renewal date
+      if (newStatus) {
+        const currentRenewal = new Date(subscription.renewalDate);
+        let nextRenewal = new Date(currentRenewal);
+
+        switch (subscription.billingCycle) {
+          case 'Weekly':
+            nextRenewal.setDate(nextRenewal.getDate() + 7);
+            break;
+          case 'Monthly':
+            nextRenewal.setMonth(nextRenewal.getMonth() + 1);
+            break;
+          case 'Quarterly':
+            nextRenewal.setMonth(nextRenewal.getMonth() + 3);
+            break;
+          case 'Yearly':
+            nextRenewal.setFullYear(nextRenewal.getFullYear() + 1);
+            break;
+        }
+
+        updates.renewalDate = nextRenewal.toISOString().split('T')[0];
+      }
+
+      updateSubscription({
+        id: subscription.id,
+        updates,
+      });
+
+      setIsPaid(newStatus);
+
+      toast({
+        title: newStatus ? "✅ Marked as Paid" : "⏳ Marked as Pending",
+        description: newStatus
+          ? `${subscription.name} payment recorded. Next renewal updated.`
+          : `${subscription.name} marked as pending.`,
+        duration: 3000,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update payment status. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <div
+      className={`p-3 rounded-lg border-2 transition-all hover:shadow-md ${cardStyle}`}
+      data-testid={`renewal-${subscription.id}`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex-1 cursor-pointer" onClick={onViewDetails}>
+          <h4 className="font-semibold text-gray-900 dark:text-gray-100">{subscription.name}</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {daysUntil === 0
+              ? '🔴 Renews today'
+              : daysUntil === 1
+              ? '🟡 Renews tomorrow'
+              : daysUntil <= 3
+              ? `🟡 Renews in ${daysUntil} days`
+              : `Renews in ${daysUntil} days`}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="text-right mr-2">
+            <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              ₹{parseFloat(subscription.amount).toFixed(2)}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {new Date(subscription.renewalDate).toLocaleDateString('en-IN', {
+                month: 'short',
+                day: 'numeric',
+              })}
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-[70px] gap-1.5 hover:bg-blue-50 dark:hover:bg-blue-950/50 hover:border-blue-400 dark:hover:border-blue-600 transition-all"
+            onClick={handlePayNow}
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            <span className="text-xs">Pay</span>
+          </Button>
+          <Button
+            size="sm"
+            className={`h-8 w-[70px] gap-1.5 transition-all ${
+              isPaid
+                ? 'bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600 shadow-sm'
+                : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-300 dark:bg-emerald-900/30 dark:hover:bg-emerald-800/40 dark:text-emerald-300 dark:border-emerald-700'
+            }`}
+            onClick={handleTogglePaid}
+            disabled={isUpdating}
+          >
+            <div className="w-3.5 h-3.5 flex items-center justify-center">
+              {isPaid && <Check className="w-3.5 h-3.5 animate-in zoom-in duration-200" />}
+            </div>
+            <span className="text-xs font-medium">{isUpdating ? '...' : 'Paid'}</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -69,7 +223,22 @@ export default function Dashboard() {
     pending: subscriptions.filter(s => s.status === 'Pending').length,
     paid: subscriptions.filter(s => s.status === 'Paid').length,
     overdue: subscriptions.filter(s => s.status === 'Overdue').length,
-    totalMonthly: subscriptions.reduce((sum, s) => sum + parseFloat(s.amount), 0),
+    totalMonthly: subscriptions.reduce((sum, s) => {
+      const amount = parseFloat(s.amount);
+      // Convert to monthly equivalent based on billing cycle
+      switch (s.billingCycle) {
+        case 'Weekly':
+          return sum + amount * 4;
+        case 'Monthly':
+          return sum + amount;
+        case 'Quarterly':
+          return sum + amount / 3;
+        case 'Yearly':
+          return sum + amount / 12;
+        default:
+          return sum + amount;
+      }
+    }, 0),
   };
 
   const upcomingRenewals = [...subscriptions]
@@ -93,7 +262,6 @@ export default function Dashboard() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-gray-600 dark:text-gray-400">
                   <span className="font-semibold text-gray-900 dark:text-gray-100">₹{stats.totalMonthly.toFixed(2)}</span>/month
                 </span>
@@ -141,47 +309,12 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-2">
                 {upcomingRenewals.map((subscription) => {
-                  const daysUntil = Math.ceil(
-                    (new Date(subscription.renewalDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-                  );
-                  
-                  // Color coding: Red for today, Yellow for <=3 days, White for >3 days
-                  let cardStyle = '';
-                  if (daysUntil === 0) {
-                    cardStyle = 'border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-950/50 hover:border-red-500 dark:hover:border-red-500';
-                  } else if (daysUntil > 0 && daysUntil <= 3) {
-                    cardStyle = 'border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-950/30 hover:border-yellow-500 dark:hover:border-yellow-500';
-                  } else {
-                    cardStyle = 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600';
-                  }
-                  
                   return (
-                    <div
+                    <RenewalItem
                       key={subscription.id}
-                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${cardStyle}`}
-                      onClick={() => setLocation(`/subscription/${subscription.id}`)}
-                      data-testid={`renewal-${subscription.id}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100">{subscription.name}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {daysUntil === 0 ? '🔴 Renews today' : daysUntil === 1 ? '🟡 Renews tomorrow' : daysUntil <= 3 ? `🟡 Renews in ${daysUntil} days` : `Renews in ${daysUntil} days`}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                            ₹{parseFloat(subscription.amount).toFixed(2)}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {new Date(subscription.renewalDate).toLocaleDateString('en-IN', { 
-                              month: 'short', 
-                              day: 'numeric'
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                      subscription={subscription}
+                      onViewDetails={() => setLocation(`/subscription/${subscription.id}`)}
+                    />
                   );
                 })}
               </div>

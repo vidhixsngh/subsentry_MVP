@@ -9,12 +9,12 @@ interface SpendingPieChartProps {
 }
 
 const COLORS = [
-  '#10b981', // emerald-500
-  '#059669', // emerald-600
-  '#34d399', // emerald-400
-  '#6ee7b7', // emerald-300
-  '#a7f3d0', // emerald-200
-  '#d1fae5', // emerald-100
+  '#eab308', // yellow-500
+  '#f59e0b', // amber-500
+  '#fbbf24', // yellow-400
+  '#fcd34d', // yellow-300
+  '#fde047', // yellow-200
+  '#fef08a', // yellow-100
 ];
 
 export default function SpendingPieChart({ data }: SpendingPieChartProps) {
@@ -48,10 +48,16 @@ export default function SpendingPieChart({ data }: SpendingPieChartProps) {
         <Tooltip
           formatter={(value: number) => `₹${value.toFixed(2)}`}
           contentStyle={{
-            backgroundColor: 'white',
-            border: '1px solid #10b981',
+            backgroundColor: 'hsl(var(--background))',
+            border: '1px solid #eab308',
             borderRadius: '8px',
             padding: '8px 12px',
+          }}
+          labelStyle={{
+            color: 'hsl(var(--foreground))',
+          }}
+          itemStyle={{
+            color: 'hsl(var(--foreground))',
           }}
         />
         <Legend

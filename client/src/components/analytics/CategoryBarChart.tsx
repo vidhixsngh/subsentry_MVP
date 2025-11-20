@@ -19,31 +19,37 @@ export default function CategoryBarChart({ data }: CategoryBarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
         <XAxis
           dataKey="name"
-          tick={{ fill: '#6b7280', fontSize: 12 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
           angle={-45}
           textAnchor="end"
           height={80}
         />
         <YAxis
-          tick={{ fill: '#6b7280', fontSize: 12 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
           tickFormatter={(value) => `₹${value}`}
         />
         <Tooltip
           formatter={(value: number) => [`₹${value.toFixed(2)}`, 'Spending']}
           contentStyle={{
-            backgroundColor: 'white',
-            border: '1px solid #10b981',
+            backgroundColor: 'hsl(var(--background))',
+            border: '1px solid #eab308',
             borderRadius: '8px',
             padding: '8px 12px',
           }}
-          cursor={{ fill: 'rgba(16, 185, 129, 0.1)' }}
+          labelStyle={{
+            color: 'hsl(var(--foreground))',
+          }}
+          itemStyle={{
+            color: 'hsl(var(--foreground))',
+          }}
+          cursor={{ fill: 'rgba(234, 179, 8, 0.1)' }}
         />
         <Bar
           dataKey="value"
-          fill="#10b981"
+          fill="#eab308"
           radius={[8, 8, 0, 0]}
           animationBegin={0}
           animationDuration={800}
