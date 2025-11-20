@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DollarSign, CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
 import SpendingPieChart from "./analytics/SpendingPieChart";
 import CategoryBarChart from "./analytics/CategoryBarChart";
 import TopSubscriptionsCard from "./analytics/TopSubscriptionsCard";
 import LeastUsedCard from "./analytics/LeastUsedCard";
+import { useSubscriptions } from "@/hooks/useSubscriptions";
+import { useLocation } from "wouter";
 
 interface AnalyticsData {
   totalMonthly: number;
@@ -39,6 +43,15 @@ interface AnalyticsDashboardProps {
 }
 
 export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProps) {
+  const [, setLocation] = useLocation();
+  const { subscriptions } = useSubscriptions();
+  const [showPaidDialog, setShowPaidDialog] = useState(false);
+  const [showAttentionDialog, setShowAttentionDialog] = useState(false);
+
+  // Filter subscriptions by status
+  const paidSubscriptions = subscriptions.filter(s => s.status === 'Paid');
+  const attentionSubscriptions = subscriptions.filter(s => s.status === 'Pending' || s.status === 'Overdue');
+
   // Prepare bar chart data
   const barChartData = Object.entries(analytics.categoryBreakdown).map(([name, value]) => ({
     name,
@@ -67,7 +80,10 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow">
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer hover:border-green-300"
+          onClick={() => setShowPaidDialog(true)}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Paid Subscriptions</CardTitle>
             <div className="p-2 bg-green-100 rounded-lg">
@@ -79,12 +95,15 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
               {analytics.statusBreakdown.Paid || 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Up to date with payments
+              Click to view list
             </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow">
+        <Card 
+          className="hover:shadow-lg transition-shadow cursor-pointer hover:border-amber-300"
+          onClick={() => setShowAttentionDialog(true)}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Needs Attention</CardTitle>
             <div className="p-2 bg-amber-100 rounded-lg">
@@ -96,11 +115,100 @@ export default function AnalyticsDashboard({ analytics }: AnalyticsDashboardProp
               {(analytics.statusBreakdown.Pending || 0) + (analytics.statusBreakdown.Overdue || 0)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {analytics.statusBreakdown.Overdue || 0} overdue, {analytics.statusBreakdown.Pending || 0} pending
+              Click to view list
             </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Paid Subscriptions Dialog */}
+      <Dialog open={showPaidDialog} onOpenChange={setShowPaidDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+              Paid Subscriptions ({paidSubscriptions.length})
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-4">
+            {paidSubscriptions.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No paid subscriptions</p>
+            ) : (
+              paidSubscriptions.map((sub) => (
+                <div
+                  key={sub.id}
+                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => {
+                    setShowPaidDialog(false);
+                    setLocation(`/subscription/${sub.id}`);
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{sub.name}</h4>
+                      <p className="text-sm text-gray-600">{sub.category}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-emerald-600">₹{parseFloat(sub.amount).toFixed(2)}</div>
+                      <div className="text-xs text-gray-500">{sub.billingCycle}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Needs Attention Dialog */}
+      <Dialog open={showAttentionDialog} onOpenChange={setShowAttentionDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-600" />
+              Needs Attention ({attentionSubscriptions.length})
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-4">
+            {attentionSubscriptions.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">All subscriptions are up to date!</p>
+            ) : (
+              attentionSubscriptions.map((sub) => (
+                <div
+                  key={sub.id}
+                  className={`p-4 border-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
+                    sub.status === 'Overdue' ? 'border-red-300 bg-red-50' : 'border-amber-300 bg-amber-50'
+                  }`}
+                  onClick={() => {
+                    setShowAttentionDialog(false);
+                    setLocation(`/subscription/${sub.id}`);
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-gray-900">{sub.name}</h4>
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                          sub.status === 'Overdue' 
+                            ? 'bg-red-200 text-red-800' 
+                            : 'bg-amber-200 text-amber-800'
+                        }`}>
+                          {sub.status}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600">{sub.category}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-gray-900">₹{parseFloat(sub.amount).toFixed(2)}</div>
+                      <div className="text-xs text-gray-500">{sub.billingCycle}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Summary Alert */}
       <Alert className="border-emerald-200 bg-emerald-50">

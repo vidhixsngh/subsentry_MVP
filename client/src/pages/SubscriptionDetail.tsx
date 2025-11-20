@@ -85,8 +85,8 @@ export default function SubscriptionDetail() {
     billingCycle: subscription.billing_cycle,
     paymentMethod: subscription.payment_method,
     lastUsedDate: subscription.last_used_date,
-    createdAt: new Date(subscription.created_at),
-    updatedAt: new Date(subscription.updated_at),
+    createdAt: subscription.created_at,
+    updatedAt: subscription.updated_at,
   } : null;
 
   return (

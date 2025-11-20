@@ -24,30 +24,8 @@ export default function Dashboard() {
                     user?.email?.split('@')[0] || 
                     'there';
 
-  // Generate AI insights when analytics data is available
-  useEffect(() => {
-    if (analytics && analytics.totalSubscriptions > 0 && !insights) {
-      generateInsights({
-        totalMonthly: analytics.totalMonthly,
-        totalSubscriptions: analytics.totalSubscriptions,
-        categoryBreakdown: analytics.categoryBreakdown,
-        top3: analytics.top3.map(sub => ({
-          name: sub.name,
-          amount: parseFloat(sub.amount),
-          category: sub.category,
-          billingCycle: sub.billingCycle,
-          lastUsedDate: sub.lastUsedDate,
-        })),
-        leastUsed: analytics.leastUsed ? {
-          name: analytics.leastUsed.name,
-          amount: parseFloat(analytics.leastUsed.amount),
-          category: '',
-          billingCycle: analytics.leastUsed.billingCycle,
-          lastUsedDate: analytics.leastUsed.lastUsedDate,
-        } : null,
-      });
-    }
-  }, [analytics?.totalSubscriptions]);
+  // Generate AI insights only when explicitly requested (optimized - no auto-generation)
+  // User can click refresh button to generate insights
 
   const handleRefreshInsights = () => {
     if (analytics) {
@@ -130,12 +108,11 @@ export default function Dashboard() {
           <div className="flex gap-3">
             <Button
               onClick={() => setLocation('/reminders')}
-              variant="outline"
-              className="gap-2"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700"
               data-testid="button-setup-reminders"
             >
               <Calendar className="w-4 h-4" />
-              Reminders
+              Set Reminders
             </Button>
             <Button
               onClick={() => setLocation('/add-subscription')}
@@ -145,8 +122,7 @@ export default function Dashboard() {
               <Plus className="w-4 h-4" />
               Add Subscription
             </Button>
-          </div>
-        </div>
+          </div>        </div>
 
         {/* Upcoming Renewals - Compact */}
         {upcomingRenewals.length > 0 && (

@@ -415,11 +415,13 @@ export default function SubscriptionDetailView({
                     Next Renewal
                   </p>
                   <p className="text-lg font-medium" data-testid="text-renewal-date">
-                    {new Date(subscription.renewalDate).toLocaleDateString('en-IN', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {subscription.renewalDate && !isNaN(new Date(subscription.renewalDate).getTime())
+                      ? new Date(subscription.renewalDate).toLocaleDateString('en-IN', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                      : 'Not set'}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {daysUntilRenewal > 0
