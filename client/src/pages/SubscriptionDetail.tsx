@@ -77,21 +77,10 @@ export default function SubscriptionDetail() {
     );
   }
 
-  // Transform Supabase data to match component expectations
-  const transformedSubscription = subscription ? {
-    ...subscription,
-    userId: subscription.user_id,
-    renewalDate: subscription.renewal_date,
-    billingCycle: subscription.billing_cycle,
-    paymentMethod: subscription.payment_method,
-    lastUsedDate: subscription.last_used_date,
-    createdAt: subscription.created_at,
-    updatedAt: subscription.updated_at,
-  } : null;
-
+  // Subscription is already transformed in the hook
   return (
     <SubscriptionDetailView
-      subscription={transformedSubscription as any}
+      subscription={subscription as any}
       onBack={handleBack}
       onEdit={handleEdit}
       onDelete={handleDelete}

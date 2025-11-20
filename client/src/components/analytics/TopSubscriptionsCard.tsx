@@ -36,9 +36,9 @@ export default function TopSubscriptionsCard({ subscriptions }: TopSubscriptions
       <CardHeader>
         <div className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-emerald-600" />
-          <CardTitle>Top 3 Subscriptions</CardTitle>
+          <CardTitle>Highest Paid Subscriptions</CardTitle>
         </div>
-        <CardDescription>Your highest-cost subscriptions (monthly equivalent)</CardDescription>
+        <CardDescription>Your top 3 subscriptions by monthly cost</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {subscriptions.map((sub, index) => (

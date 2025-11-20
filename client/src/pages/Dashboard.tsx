@@ -144,16 +144,21 @@ export default function Dashboard() {
                   const daysUntil = Math.ceil(
                     (new Date(subscription.renewalDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
                   );
-                  const isUrgent = daysUntil <= 3;
+                  
+                  // Color coding: Red for today, Yellow for <=3 days, White for >3 days
+                  let cardStyle = '';
+                  if (daysUntil === 0) {
+                    cardStyle = 'border-red-400 bg-red-50 hover:border-red-500';
+                  } else if (daysUntil > 0 && daysUntil <= 3) {
+                    cardStyle = 'border-yellow-400 bg-yellow-50 hover:border-yellow-500';
+                  } else {
+                    cardStyle = 'border-gray-200 bg-white hover:border-gray-300';
+                  }
                   
                   return (
                     <div
                       key={subscription.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-                        isUrgent
-                          ? 'border-amber-300 bg-amber-50'
-                          : 'border-gray-200 bg-white'
-                      }`}
+                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${cardStyle}`}
                       onClick={() => setLocation(`/subscription/${subscription.id}`)}
                       data-testid={`renewal-${subscription.id}`}
                     >
@@ -161,7 +166,7 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900">{subscription.name}</h4>
                           <p className="text-sm text-gray-600">
-                            {daysUntil === 0 ? 'Renews today' : daysUntil === 1 ? 'Renews tomorrow' : `Renews in ${daysUntil} days`}
+                            {daysUntil === 0 ? '🔴 Renews today' : daysUntil === 1 ? '🟡 Renews tomorrow' : daysUntil <= 3 ? `🟡 Renews in ${daysUntil} days` : `Renews in ${daysUntil} days`}
                           </p>
                         </div>
                         <div className="text-right">

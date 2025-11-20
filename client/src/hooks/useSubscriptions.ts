@@ -25,7 +25,7 @@ export function useSubscriptions() {
 
       if (error) throw error;
       
-      // Transform snake_case to camelCase for frontend
+      // Transform snake_case to camelCase for frontend - keep dates as strings
       return data.map((sub: any) => ({
         id: sub.id,
         userId: sub.user_id,
@@ -38,8 +38,8 @@ export function useSubscriptions() {
         paymentMethod: sub.payment_method,
         notes: sub.notes,
         lastUsedDate: sub.last_used_date,
-        createdAt: new Date(sub.created_at),
-        updatedAt: new Date(sub.updated_at),
+        createdAt: sub.created_at,
+        updatedAt: sub.updated_at,
       }));
     },
     enabled: !!user,
@@ -161,7 +161,7 @@ export function useSubscription(id: string) {
 
       if (error) throw error;
       
-      // Transform snake_case to camelCase for frontend
+      // Transform snake_case to camelCase for frontend - keep dates as strings
       return {
         id: data.id,
         userId: data.user_id,
@@ -174,8 +174,8 @@ export function useSubscription(id: string) {
         paymentMethod: data.payment_method,
         notes: data.notes,
         lastUsedDate: data.last_used_date,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
       };
     },
     enabled: !!user && !!id,

@@ -58,7 +58,7 @@ export default function AppHeader({ userName, onSettingsClick }: AppHeaderProps)
             <Button
               variant={isActive('/') ? 'default' : 'ghost'}
               onClick={() => setLocation('/')}
-              className="gap-2"
+              className={`gap-2 ${isActive('/') ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
               data-testid="nav-dashboard"
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -67,7 +67,7 @@ export default function AppHeader({ userName, onSettingsClick }: AppHeaderProps)
             <Button
               variant={isActive('/analytics') ? 'default' : 'ghost'}
               onClick={() => setLocation('/analytics')}
-              className="gap-2"
+              className={`gap-2 ${isActive('/analytics') ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
               data-testid="nav-analytics"
             >
               <BarChart3 className="w-4 h-4" />
